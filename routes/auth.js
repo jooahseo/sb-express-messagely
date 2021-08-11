@@ -20,7 +20,7 @@ router.post("/login", (req, res, next) => {
     if (response) {
       User.updateLoginTimestamp(username);
       const token = jwt.sign({ username }, SECRET_KEY);
-      res.json({ message: `Welcome! ${username}`, token });
+      return res.json({ message: `Welcome! ${username}`, token });
     } else {
       throw new ExpressError("Invalid username or password", 400);
     }
@@ -48,7 +48,7 @@ router.post("/register", (req, res, next) => {
     if (response) {
         User.updateLoginTimestamp(username);
         const token = jwt.sign({ username }, SECRET_KEY);
-        res.json({message: `Welcome! ${username}`, token})
+        return res.json({message: `Welcome! ${username}`, token})
     }
   } catch (e) {
     if (e.code === "23505") {
