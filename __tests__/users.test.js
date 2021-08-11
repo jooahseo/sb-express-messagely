@@ -41,6 +41,7 @@ describe("Test User class", function () {
   test("can update login timestamp", async function () {
     await db.query("UPDATE users SET last_login_at=NULL WHERE username='test'");
     let u = await User.get("test");
+
     expect(u.last_login_at).toBe(null);
 
     User.updateLoginTimestamp("test");
@@ -55,7 +56,7 @@ describe("Test User class", function () {
       first_name: "Test",
       last_name: "Testy",
       phone: "+14155550000",
-      last_login_at: expect.any(Date),
+      last_login_at: null,
       join_at: expect.any(Date),
     });
   });
