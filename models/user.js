@@ -16,7 +16,7 @@ class User {
       `INSERT INTO users 
       (username, password, first_name,last_name,phone,join_at)
       VALUES ($1,$2,$3,$4,$5, current_timestamp)
-      RETURNING username, password`,
+      RETURNING username, password, first_name, last_name, phone`,
       [username, hashedPw, first_name, last_name, phone]
     );
     return result.rows[0];
