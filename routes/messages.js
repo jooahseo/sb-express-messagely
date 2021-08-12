@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { Message } = require("../models/message");
+const Message = require("../models/message");
 const ExpressError = require("../expressError");
 const { ensureLoggedIn, ensureCorrectUser } = require("../middleware/auth");
 
@@ -16,9 +16,9 @@ const { ensureLoggedIn, ensureCorrectUser } = require("../middleware/auth");
  * Make sure that the currently-logged-in users is either the to or from user.
  *
  **/
-router.get("/:id", (req, res, next) => {
+router.get("/:id", async (req, res, next) => {
   try {
-    const m = Message.get(req.params.id);
+    const m = await Message.get(req.params.id);
     if (
       req.user.username === m.from_user.username ||
       req.user.username === m.to_user.username
@@ -37,7 +37,7 @@ router.get("/:id", (req, res, next) => {
  *   {message: {id, from_username, to_username, body, sent_at}}
  *
  **/
-router.post("/", ensureLoggedIn, (req, res, next) => {
+router.post("/", ensureLoggedIn, async (req, res, next) => {
   try {
     const { to_username, body } = req.body;
     const from_username = req.user.username;
@@ -45,7 +45,7 @@ router.post("/", ensureLoggedIn, (req, res, next) => {
       throw new ExpressError("to_username and body are required", 400);
     }
     const messageObj = { from_username, to_username, body };
-    const m = Message.create(messageObj);
+    const m = await Message.create(messageObj);
     return res.json({ message: m });
   } catch (e) {
     return next(e);
@@ -58,13 +58,13 @@ router.post("/", ensureLoggedIn, (req, res, next) => {
  * Make sure that the only the intended recipient can mark as read.
  *
  **/
-router.post("/:id/read", (req, res, next) => {
+router.post("/:id/read", async (req, res, next) => {
   try {
-    const m = Message.get(req.params.id);
+    const m = await Message.get(req.params.id);
     if (m.to_user.username !== req.user.username) {
       throw new ExpressError("Unauthorized", 401);
     }
-    const read = Message.markRead(req.params.id);
+    const read = await Message.markRead(req.params.id);
     return res.json({ message: read });
   } catch (e) {
     return next(e);

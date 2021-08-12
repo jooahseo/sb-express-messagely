@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { User } = require("../models/user");
+const User = require("../models/user");
 const ExpressError = require("../expressError");
 const {ensureLoggedIn, ensureCorrectUser} = require("../middleware/auth")
 
@@ -10,9 +10,9 @@ const {ensureLoggedIn, ensureCorrectUser} = require("../middleware/auth")
  *
  **/
 
-router.get("/", (req, res, next) => {
+router.get("/", async (req, res, next) => {
   try {
-    const allUsers = User.all();
+    const allUsers = await User.all();
     return res.json({ users: allUsers });
   } catch (e) {
     return next(e);
@@ -25,9 +25,9 @@ router.get("/", (req, res, next) => {
  * only that user can view their get-user-detail route.
  **/
 
-router.get("/:username", ensureCorrectUser, (req, res, next) => {
+router.get("/:username", ensureCorrectUser, async (req, res, next) => {
   try {
-    const userInfo = User.get(req.params.username);
+    const userInfo = await User.get(req.params.username);
     return res.json({ user: userInfo });
   } catch (e) {
     return next(e);
@@ -44,9 +44,9 @@ router.get("/:username", ensureCorrectUser, (req, res, next) => {
  * only that user can view their from-messages or to-messages routes.
  **/
 
-router.get("/:username/to", ensureCorrectUser, (req, res, next) => {
+router.get("/:username/to", ensureCorrectUser, async (req, res, next) => {
   try {
-    const messagesTo = User.messagesTo(req.params.username);
+    const messagesTo = await User.messagesTo(req.params.username);
     return res.json({ messages: messagesTo });
   } catch (e) {
     return next(e);
@@ -63,9 +63,9 @@ router.get("/:username/to", ensureCorrectUser, (req, res, next) => {
  * only that user can view their from-messages or to-messages routes.
  **/
 
-router.get("/:username/from", ensureCorrectUser, (req, res, next) => {
+router.get("/:username/from", ensureCorrectUser, async (req, res, next) => {
   try {
-    const messagesFrom = User.messagesFrom(req.params.username);
+    const messagesFrom = await User.messagesFrom(req.params.username);
     return res.json({ messages: messagesFrom });
   } catch (e) {
     return next(e);

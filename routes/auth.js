@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { User } = require("../models/user");
+const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 const { SECRET_KEY } = require("../config");
 const ExpressError = require("../expressError");
@@ -10,13 +10,13 @@ const ExpressError = require("../expressError");
  * Make sure to update their last-login!
  *
  **/
-router.post("/login", (req, res, next) => {
+router.post("/login", async (req, res, next) => {
   try {
     const { username, password } = req.body;
     if (!username || !password) {
       throw new ExpressError("username and password are required", 400);
     }
-    const response = User.authenticate(username, password);
+    const response = await User.authenticate(username, password);
     if (response) {
       User.updateLoginTimestamp(username);
       const token = jwt.sign({ username }, SECRET_KEY);
@@ -35,7 +35,7 @@ router.post("/login", (req, res, next) => {
  *  Make sure to update their last-login!
  */
 
-router.post("/register", (req, res, next) => {
+router.post("/register", async (req, res, next) => {
   try {
     const { username, password, first_name, last_name, phone } = req.body;
     if (!username || !password || !first_name || !last_name || !phone) {
@@ -44,7 +44,7 @@ router.post("/register", (req, res, next) => {
         400
       );
     }
-    const response = User.register(username, password, first_name, last_name, phone);
+    const response = await User.register({username, password, first_name, last_name, phone});
     if (response) {
         User.updateLoginTimestamp(username);
         const token = jwt.sign({ username }, SECRET_KEY);
