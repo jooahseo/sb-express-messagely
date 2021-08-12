@@ -25,7 +25,7 @@ router.post("/login", (req, res, next) => {
       throw new ExpressError("Invalid username or password", 400);
     }
   } catch (e) {
-    next(e);
+    return next(e);
   }
 });
 /** POST /register - register user: registers, logs in, and returns token.
@@ -54,7 +54,7 @@ router.post("/register", (req, res, next) => {
     if (e.code === "23505") {
       return next(new ExpressError("Username taken. Please pick another!", 400));
     }
-    next(e);
+    return next(e);
   }
 });
 
