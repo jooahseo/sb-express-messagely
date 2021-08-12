@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { User } = require("../models/user");
 const ExpressError = require("../expressError");
+const {ensureLoggedIn, ensureCorrectUser} = require("../middleware/auth")
 
 /** GET / - get list of users.
  *
@@ -14,22 +15,22 @@ router.get("/", (req, res, next) => {
     const allUsers = User.all();
     return res.json({ users: allUsers });
   } catch (e) {
-    next(e);
+    return next(e);
   }
 });
 
 /** GET /:username - get detail of users.
  *
  * => {user: {username, first_name, last_name, phone, join_at, last_login_at}}
- *
+ * only that user can view their get-user-detail route.
  **/
 
-router.get("/:username", (req, res, next) => {
+router.get("/:username", ensureCorrectUser, (req, res, next) => {
   try {
     const userInfo = User.get(req.params.username);
     return res.json({ user: userInfo });
   } catch (e) {
-    next(e);
+    return next(e);
   }
 });
 
@@ -40,15 +41,15 @@ router.get("/:username", (req, res, next) => {
  *                 sent_at,
  *                 read_at,
  *                 from_user: {username, first_name, last_name, phone}}, ...]}
- *
+ * only that user can view their from-messages or to-messages routes.
  **/
 
-router.get("/:username/to", (req, res, next) => {
+router.get("/:username/to", ensureCorrectUser, (req, res, next) => {
   try {
     const messagesTo = User.messagesTo(req.params.username);
     return res.json({ messages: messagesTo });
   } catch (e) {
-    next(e);
+    return next(e);
   }
 });
 
@@ -59,15 +60,15 @@ router.get("/:username/to", (req, res, next) => {
  *                 sent_at,
  *                 read_at,
  *                 to_user: {username, first_name, last_name, phone}}, ...]}
- *
+ * only that user can view their from-messages or to-messages routes.
  **/
 
-router.get("/:username/from", (req, res, next) => {
+router.get("/:username/from", ensureCorrectUser, (req, res, next) => {
   try {
     const messagesFrom = User.messagesFrom(req.params.username);
     return res.json({ messages: messagesFrom });
   } catch (e) {
-    next(e);
+    return next(e);
   }
 });
 
